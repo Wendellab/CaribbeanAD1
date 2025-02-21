@@ -3,10 +3,10 @@
 Manuscript link: to be updated
 
 <p float="left">
-  <img src="https://github.com/WeixuanPlant/NZAzorella/blob/main/Supplymentary/filedAcyno.jpg" height="150" />
-  <img src="https://github.com/WeixuanPlant/NZAzorella/blob/main/Supplymentary/filedAcyno2.jpg" height="150" /> 
-  <img src="https://github.com/WeixuanPlant/NZAzorella/blob/main/Supplymentary/filedAroughii.jpg" height="150" /> 
-  <img src="https://github.com/WeixuanPlant/NZAzorella/blob/main/Supplymentary/filedAroughii2.jpg" height="150" /> 
+  <img src="Supplementary/Cabo Rojo flower.JPEG" height="150" />
+  <img src="Supplementary/Cabo Rojo population typical view.JPEG" height="150" /> 
+  <img src="Supplementary/Cabo Rojo seeds and fibers 1.JPEG" height="150" /> 
+  <img src="Supplementary/PR325 Salinas Providencia Population 11.JPEG" height="150" /> 
 </p>
 
 #
