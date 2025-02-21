@@ -3,10 +3,14 @@
 Manuscript link: to be updated
 
 <p float="left">
-  <img src="Supplementary/Cabo Rojo flower.JPEG" height="150" />
-  <img src="Supplementary/Cabo Rojo population typical view.JPEG" height="150" /> 
-  <img src="Supplementary/Cabo Rojo seeds and fibers 1.JPEG" height="150" /> 
-  <img src="Supplementary/PR325 Salinas Providencia Population 11.JPEG" height="150" /> 
+  <img src="Supplementary/Cabo Rojo flower.JPEG" height="170" />
+  <img src="Supplementary/Cabo Rojo population typical view.JPEG" height="170" /> 
+  <img src="Supplementary/Cabo Rojo seeds and fibers 1.JPEG" height="170" /> 
+  <img src="Supplementary/PR325 Salinas Providencia Population 11.JPEG" height="170" /> 
+  <br>
+	<img src="Supplementary/YUC_boll.jpg" height="170" />
+	<img src="Supplementary/YUC_buds copy.jpg" height="170" /> 
+	<img src="Supplementary/YUC_flower.jpg" height="170" /> 
 </p>
 
 #
