@@ -25,4 +25,6 @@
 
 #### Identifying wild Gh relationships: [03_WildCottonPCAStructure_n86_n128](https://github.com/Wendellab/CaribbeanAD1/tree/main/03_WildCottonPCAStructure_n86_n128)
 
+#### Identifying gene flow/introgression in Caribbean Gh: [04_TreemixDsuit_n128](https://github.com/Wendellab/CaribbeanAD1/tree/main/04_TreemixDsuit_n128)
+
 
