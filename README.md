@@ -23,6 +23,6 @@
 
 #### Identifying feral Gh samples: [02_FeralCottonPR_n145](https://github.com/Wendellab/CaribbeanAD1/tree/main/02_FeralCottonPR_n145)
 
-#### Rawreads trimming to final VCF construction: (00_BuildingGVCFs)[https://github.com/Wendellab/CaribbeanAD1/tree/main/00_BuildingGVCFs]
+#### Identifying wild Gh relationships: [03_WildCottonPCAStructure_n86_n128](https://github.com/Wendellab/CaribbeanAD1/tree/main/03_WildCottonPCAStructure_n86_n128)
 
 
