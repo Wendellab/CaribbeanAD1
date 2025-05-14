@@ -1,4 +1,4 @@
-### Selecting the Gb wild samples from (Yuan et al)[https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/advs.202003634] samples 
+### Selecting the Gb wild samples from Yuan et al [https://advanced.onlinelibrary.wiley.com/doi/full/10.1002/advs.202003634] samples 
 
 #### Reads trimming
 ```
