@@ -36,7 +36,7 @@ done
 
 # some steps using mafft and eye scanning the two copies of cpDNA outcome not mentioned in here
 
-#############################################################################################################################
+###################################################################################
 
 ### For whole plastome
 
@@ -74,6 +74,30 @@ iqtree2 -s ../plastome12_IRB_n158_aln_trimmed_aln_nogap_sort.fasta -B 1000 -T AU
 ```
 
 
-#############################################################################################################################
+###################################################################################
 
-### For whole plastome
+### For gene sequences in plastome
+
+#### Transferring the annotation using AD1_GD_G7C results to all other cotton samples via [PGA](https://github.com/quxiaojian/PGA) 
+```
+# convert the alignment to unaligned fasta
+sed 's/-//g' plastome12_n457_aln_sort.fasta > plastome12_n457_aln_sort_fixed.fasta
+# seperate a multi-sample fasta into individual sequences
+seqkit split --by-id --line-width 0 plastome12_n457_aln_sort_fixed.fasta
+
+module load ncbi-rmblastn/2.14.0-py310-vqnew3z
+module load blast
+
+#Transfer the annotation from reference folder into targeted folder plastome457 and save the gb format output in putput PGA
+perl /lustre/hdd/LAS/jfw-lab/weixuan/09_getorgenelle/PGA/PGA.pl \
+-r /lustre/hdd/LAS/jfw-lab/weixuan/09_getorgenelle/PGA/plastomes/reference \
+-t /lustre/hdd/LAS/jfw-lab/weixuan/09_getorgenelle/PGA/plastomes/plastome457 \
+-o /lustre/hdd/LAS/jfw-lab/weixuan/09_getorgenelle/PGA/plastomes/outputPGA
+```
+
+
+#### extract the gene sequences using a customized python scrip [extract_gene_final.py]() that takes a list of genebank format files and output the loci sequences in the output folder ./loci110_n158/
+```
+# 
+grep -f select_n158.txt plastome_n457.list > select_n158_gb.txt
+python extract_gene_final.py select_n158_gb.txt ./loci110_n158/
