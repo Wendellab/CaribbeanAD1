@@ -27,4 +27,5 @@
 
 #### Identifying gene flow/introgression in Caribbean Gh: [04_TreemixDsuit_n128](https://github.com/Wendellab/CaribbeanAD1/tree/main/04_TreemixDsuit_n128)
 
+#### Extracting whole plastomes and coding genes: [05_plastome_n123](https://github.com/Wendellab/CaribbeanAD1/tree/main/05_plastome_n123)
 
