@@ -77,3 +77,4 @@ module load r
 Rscript PCA_plot.R
 ```
 
+### A nice code block for R map plot of (Caribbean islands cotton samples)[https://github.com/Wendellab/CaribbeanAD1/blob/main/02_FeralCottonPR_n145/FINAL_GoogleMap_DistributionMapPlot.R]
