@@ -1,4 +1,4 @@
-### Tajima's D and Watterson's theta estimation using [Angsd Thetas] (https://www.popgen.dk/angsd/index.php/Thetas,Tajima,Neutrality_tests) and [Angsd SFS](https://www.popgen.dk/angsd/index.php/SFS_Estimation)
+### Tajima's D and Watterson's theta estimation using [Angsd Thetas](https://www.popgen.dk/angsd/index.php/Thetas,Tajima,Neutrality_tests) and [Angsd SFS](https://www.popgen.dk/angsd/index.php/SFS_Estimation)
 
 #### MAF SFS and Tajima's D and Watterson's theta
 ```
