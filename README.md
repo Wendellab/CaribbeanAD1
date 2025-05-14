@@ -31,4 +31,5 @@
 
 #### Comparing the genetic diversity and population differentiation in Caribbean cotton: [06_Pixy_n121](https://github.com/Wendellab/CaribbeanAD1/tree/main/06_Pixy_n121)
 
+#### Comparing the inbreeding and heterzygosity level in Caribbean cotton: [07_ROH_He_121](https://github.com/Wendellab/CaribbeanAD1/tree/main/07_ROH_He_121)
 
