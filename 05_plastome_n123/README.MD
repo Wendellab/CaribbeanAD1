@@ -96,8 +96,33 @@ perl /lustre/hdd/LAS/jfw-lab/weixuan/09_getorgenelle/PGA/PGA.pl \
 ```
 
 
-#### extract the gene sequences using a customized python scrip [extract_gene_final.py]() that takes a list of genebank format files and output the loci sequences in the output folder ./loci110_n158/
+#### extract the gene sequences using a customized python scrip [extract_gene_final.py](https://github.com/Wendellab/CaribbeanAD1/blob/main/05_plastome_n123/extract_gene_final.py) that takes a list of genebank format files and output the loci sequences in the output folder ./loci110_n158/
 ```
-# 
+# generate a list of targeted gb files and extract the sequences
 grep -f select_n158.txt plastome_n457.list > select_n158_gb.txt
 python extract_gene_final.py select_n158_gb.txt ./loci110_n158/
+
+```
+
+#### build alignment for each gene sequence had >= 158 samples using mafft and remove the gaps
+```
+grep ">" -c *.fasta | sed 's/.fasta:/ /' | sort -g -k 2 | awk '$2 >= 158  { print $1}' > plastome_gene110.txt
+word=$(cat plastome_gene110.txt | sed -n ${SLURM_ARRAY_TASK_ID}p)
+
+module load mafft/7.508
+echo "${word}"
+
+mafft --auto --thread 10 "${word}".fasta > aln/"${word}"_aln.fasta
+/lustre/hdd/LAS/jfw-lab/weixuan/00_BioinformaticTools/trimal/source/trimal -nogaps -in "${word}"_aln.fasta -out "${word}"_trim.fasta  
+```
+
+#### Build the concatenated ML iqtree using the final trimmed alignments
+```
+module load iqtree2/2.2.2.7-py310-kcqit6n
+iqtree2 -p ../aln --prefix cotton_n457_concat -B 1000 -T AUTO
+```
+
+#### concatenate all gene sequences into one fasta for PAUP and PopArt to run
+```
+seqkit concat ../aln/*.fasta > ./loci110_concat.fasta
+```
