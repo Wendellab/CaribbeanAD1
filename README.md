@@ -33,3 +33,6 @@
 
 #### Comparing the inbreeding and heterzygosity level in Caribbean cotton: [07_ROH_He_121](https://github.com/Wendellab/CaribbeanAD1/tree/main/07_ROH_He_121)
 
+#### Comparing the LDdecay trends in Caribbean cotton: [08_LDdecay_n121](https://github.com/Wendellab/CaribbeanAD1/tree/main/08_LDdecay_n121)
+
+#### Understanding the population divergence using coalescent model 
