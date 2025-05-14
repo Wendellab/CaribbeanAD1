@@ -17,9 +17,56 @@
 *Gossypium hirsutum* is the world’s most important source of cotton fiber, yet the diversity and population structure of its wild forms remain largely unexplored. The complex domestication history of G. hirsutum combined with its reciprocal introgression with a second domesticated species, *G. barbadense*, has generated a wealth of morphological forms and feral derivatives of both species and their interspecies recombinants, which collectively are scattered across a large geographic range in arid regions of the Caribbean basin. In this study, we aimed to assess genetic diversity within and among populations from two Caribbean islands, Puerto Rico (n = 43, five sites) and Guadeloupe (n = 25, one site), which contain putative wild and introgressed forms. Using whole genome resequencing data combined with a phylogenomic framework derived from a broader genomic survey, we parsed individuals into feral derivatives and truly wild forms. Feral cottons variously show genetic and morphological resemblance to the domesticated cottons, and vary greatly in genetic variation and heterozygosity, reflecting a complex history of interspecific and intraspecific gene flow that is spatially highly variable in its effects. Furthermore, wild cottons in both Caribbean islands appear to be relatively inbred, especially the Guadeloupe samples. Our results highlight the dynamics of population demographics in relictual wild cottons that experienced profound genetic bottlenecks associated with habitat destruction superimposed on a natural pattern of widely scattered populations. These results have implications for conservation of wild diversity in *G. hirsutum*. 
 
 #
-THIS IS NOT COMPLETE AT ALL, I am waiting for the final manuscritp ready to complete this part. Please ignore eveyrthing belowe this line.
+### SNP extraction in (00_BuildingGVCFs)[https://github.com/Wendellab/CaribbeanAD1/tree/main/00_BuildingGVCFs]
 
-### SNP extraction 
+Reads trimming
+```
+module load  trimmomatic/0.39-zwxnnrx
+trimmomatic PE -threads $thr $file1 $file2 $tDir/$name.R1.fq.gz $tDir/$name.U1.fq.gz $tDir/$name.R2.fq.gz $tDir/$name.U2.fq.gz ILLUMINACLIP:Adapters.fa:2:30:10:2:True LEADING:3 TRAILING:3 MINLEN:75
+```
+
+Reads mapping
+```
+module load bwa
+bwa mem -M -R "@RG\tID:$name \tSM:$name \tPL:ILLUMINA" -t $thr $ref $tDir/$name.R1.fq.gz $tDir/$name.R2.fq.gz > $name.sam
+```
+
+Mapped reads sorting in Sentieon
+```
+module load sentieon-genomics
+sentieon util sort -o $name.sort.bam -t $thr --sam2bam -i $name.sam
+
+#extimate stats with sentieon-genomics:
+sentieon driver -t $thr -r $ref -i $name.sort.bam --algo GCBias --summary $name.GC.summary $name.GC.metric --algo MeanQualityByCycle $name.MQ.metric --algo QualDistribution $name.QD.metric --algo InsertSizeMetricAlgo $name.IS.metric --algo AlignmentStat $name.ALN.metric 
+sentieon plot metrics -o $name.metric.pdf gc=$name.GC.metric mq=$name.MQ.metric qd=$name.QD.metric isize=$name.IS.metric 
+
+sentieon driver -t $thr -i $name.sort.bam --algo LocusCollector --fun score_info $name.score 
+sentieon driver -t $thr -i $name.sort.bam --algo Dedup --rmdup --score_info $name.score --metrics $name.dedup.metric $name.dedup.bam 
+
+#realign with sentieon-genomics:
+sentieon driver -t $thr -r $ref -i $name.dedup.bam --algo Realigner $name.realign.bam
+
+#### BELOW IS ME ######
+#coverage caculation:
+sentieon driver -t $thr -r $ref -i $name.realign.bam --algo CoverageMetrics coverageoutput/$name
+
+#Base quality score recalibration:
+sentieon driver -t $thr -r $ref -i $name.realign.bam --algo QualCal $name.RECAL_DATA.TABLE
+
+#create gvcf files with sentieon-genomics:
+sentieon driver -t $thr -r $ref -i $name.realign.bam -q $name.RECAL_DATA.TABLE --algo Haplotyper $name.gVCF --emit_mode gvcf 
+```
+
+
+
+
+
+
+
+
+
+
+
 
 We extracted Angiosperm353 loci via [HybPiper](https://github.com/mossmatters/HybPiper) using target-enrichment sequencing, and high-copy marker of plastome and nrDNA were extracted via [Getorgenalla](https://github.com/Kinggerm/GetOrganelle). All bioinformatic were performed via New Zealand eScience Infrastructure [NeSI](https://www.nesi.org.nz/)
  
