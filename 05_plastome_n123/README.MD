@@ -1,4 +1,4 @@
-### Wild cotton plastome relationships
+### Wild cotton plastome relationships 
 
 #### extracting whole plastomes using trimmed WGS reads
 ```
@@ -21,5 +21,59 @@ for i in "${files[@]}"; do d="${i%/*}"; d_="${d##*/}";  f="${i##*/}"; \
 cp "$i" /lustre/hdd/LAS/jfw-lab/weixuan/09_getorgenelle/plastome_output_aln"${d_}"_"$f"; done
 ```
 
-#### renaming the plastome output file names by adding sample infor
+#### renaming the plastome output fasta headers according to the file names and add "_1" and "_2" for two extraction results
 ```
+for FILE in *.fasta;
+do
+ awk '/^>/ {gsub(/.fa(sta)?$/,"",FILENAME);printf(">%s\n",FILENAME);next;} {print}' $FILE > changed_${FILE}
+done
+
+for FILE in changed*.fasta;
+	do
+	awk 'BEGIN{RS=">"}{if(NR>1)print ">"$1"_"(NR-1)"\n"$2}' $FILE > sorted_${FILE}
+done
+```
+
+# some steps using mafft and eye scanning the two copies of cpDNA outcome not mentioned in here
+
+#############################################################################################################################
+
+### For whole plastome
+
+#### set up a dummpy IRB sequence from the annotation of AD1_GD_G7C via [Geseq](https://chlorobox.mpimp-golm.mpg.de/geseq.html), using mafft to and seqkit to remove IRB region across all samples, then remove the 'dummpy IRB' region sequence using sed 
+```
+module load mafft
+mafft --thread 80 plastome12_IRB_n158.fasta > plastome12_IRB_n158_aln.fasta
+seqkit mutate -d 89419:115020 --quiet -w 0  plastome12_IRB_n158_aln.fasta  | sed '/IRB/{N;d;}'  > plastome12_IRB_n158_aln_trimmed.fasta
+```
+
+
+#### building a nex format for MP based (PAUP4*)[https://paup.phylosolutions.com/]
+```
+#realign the sequences that without IRB region
+mafft --thread 80 plastome12_IRB_n158_aln_trimmed.fasta > plastome12_IRB_n158_aln_trimmed_aln.fasta
+
+#trim all gaps using trimal
+/lustre/hdd/LAS/jfw-lab/weixuan/00_BioinformaticTools/trimal/source/trimal -nogaps \
+-in plastome12_IRB_n158_aln_trimmed_aln.fasta  -out plastome12_IRB_n158_aln_trimmed_aln_nogap.fasta
+
+#sort the fasta based on sequence headers (names)
+seqkit sort -n plastome12_IRB_n158_aln_trimmed_aln_nogap.fasta > plastome12_IRB_n158_aln_trimmed_aln_nogap_sort.fasta
+
+#check the sequence duplication details to report in Haplotype analysis using [popart](https://popart.maths.otago.ac.nz/) 
+cat plastome12_IRB_n158_aln_trimmed_aln_nogap_sort.fasta | seqkit rmdup -s -w 0 -o plastome_rmconst_rmdup.fasta -d plastome_rmconst_dup.fasta -D duplicated.detail.txt
+
+#convert fasta into nex for PAUP and Popart
+seqmagick convert --output-format nexus --alphabet dna plastome12_IRB_n158_aln_trimmed_aln_nogap_sort.fasta plastome12_IRB_n158_aln_trimmed_aln_nogap_sort.nex
+```
+
+#### ML based [IQtree2](https://github.com/iqtree/iqtree2)
+```
+module load iqtree2/2.2.2.7-py310-kcqit6n
+iqtree2 -s ../plastome12_IRB_n158_aln_trimmed_aln_nogap_sort.fasta -B 1000 -T AUTO --prefix plastome12_noIRB_n158
+```
+
+
+#############################################################################################################################
+
+### For whole plastome
