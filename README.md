@@ -35,4 +35,4 @@
 
 #### Comparing the LDdecay trends in Caribbean cotton: [08_LDdecay_n121](https://github.com/Wendellab/CaribbeanAD1/tree/main/08_LDdecay_n121)
 
-#### Understanding the population divergence using coalescent model 
+#### Understanding the population divergence using coalescent model [09_Angsd_PSMC](https://github.com/Wendellab/CaribbeanAD1/tree/main/09_Angsd_PSMC)
