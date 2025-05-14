@@ -124,14 +124,6 @@ sfs.PR325 <- as.data.frame(scan("PR_PR325.sfs")[c(2:16)]) %>%
                         96.7 * (1 / site + 1 / (30 - site)))) %>%    
   mutate(thetafreq = theta / sum(theta) *100) 
 
-#sfs.Ph <- as.data.frame(scan("PR_Ph.sfs")[c(2:6)]) %>%
-#  mutate(filename = "PR_Ph")  %>%
-#  mutate(site = as.numeric(rownames(.))) %>%
-#  rename("frequency" = 1) %>% 
-#  mutate(freq = (frequency / sum(frequency))*100) %>%
-#  mutate(theta=10624986* (1/site + 1/(10 - site))) %>% 
-#  mutate(thetafreq = theta / sum(theta) *100) 
-
 sfs.MK <- as.data.frame(scan("PR_MK.sfs")[c(2:26)]) %>%
   mutate(filename = "MK")  %>%
   mutate(site = as.numeric(rownames(.))) %>%
@@ -141,9 +133,6 @@ sfs.MK <- as.data.frame(scan("PR_MK.sfs")[c(2:26)]) %>%
                         79.7 * (1 / site),
                         79.7 * (1 / site + 1 / (50 - site)))) %>%  
   mutate(thetafreq = theta / sum(theta) *100) 
-rm(sfs.Ph)
-
-theta=79.7* (1/25 )
 
 sum(as.data.frame(scan("PR_GD.sfs")[c(2:22)]))
 sum(as.data.frame(scan("PR_CR.sfs")[c(2:16)]))
@@ -263,38 +252,3 @@ finalplot2 <-
 pdf("FigS8_MKPRGD_PSMC.pdf", width =10, height = 8)
 finalplot2
 dev.off()
-
-
-
-
-
-
-
-##########################################
-
-smc <- read.csv("../sfs_psmc/joint.csv", header = T, sep = ',')
-#smc_wild <- read.csv("smc_plot_wild.csv", header = T, sep = ',')
-
-smc_mk_wild <- rbind(smc_wild,smc)
-
-colnames(smc) <- c("Population/Group", "Year", "Ne", "type" , "num")
-
-breaks = c(2000, 3000,  5000, 7000, 10000, 50000)
-labels = as.character(breaks)
-
-smc.plot <- ggplot(smc, aes(x=Year, y=Ne)) +
-#  geom_rect(aes(xmin=9000, xmax=11000, ymin=0, ymax=Inf), alpha = 0.01, color = "black",
-#            fill = "grey")+ 
-  geom_line(aes(color=`Population/Group`), size =2, alpha = 0.7) +
-#  geom_point(aes(color=label)) + 
-  scale_y_continuous(trans='log10',labels = scales::comma) + 
-  
-#  scale_x_continuous(trans='log10',labels = trans_format('log10',math_format(10^.x))) +
-  scale_x_continuous(trans='log10', breaks = breaks) +
-  scale_color_manual(values = c("#D55E00", "grey20"))+
-  theme_bw() +  
-  theme(legend.position =  c(0.13, 0.8),
-        #legend.title=element_blank(),
-        legend.key = element_rect(fill = "white", colour = "grey30", linetype="dotted")) 
-
-smc.plot
