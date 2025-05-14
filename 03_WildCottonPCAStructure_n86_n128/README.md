@@ -41,8 +41,14 @@ Rscript PCA_plot.R
 #### Plot Plink outcome in 3D
 ```
 module purge
-
 module load py-seaborn/0.12.2-py310-6p2ciw6
-
 python 3D-PCA-plot-wx3.py --evec GD_n90.eigenvec.3d --eval GD_n90.eigenval.3d --s 100 --x 8 --y 8 --o MKGDPR_n86_3dPCA.tiff
+```
+
+#### Run LEA
+```
+module load r
+Rscript LEA.R
+cut -d ' ' -f 2 *.ped > samplename.txt
+Rscript LEA_plot.R
 ```
