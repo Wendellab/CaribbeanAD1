@@ -21,8 +21,6 @@ library(cowplot)
 ############## Caribbean region ##################################
 ##################################################################
 
-register_google("AIzaSyAFMCC4ztGaZzBKvTMo4ByO5pBZVPhR5tQ") #for the ggmap package
-
 gpsmk <- read.csv("CottonSamplingMap3.csv")
 
 gpsmk2 <- gpsmk %>%
