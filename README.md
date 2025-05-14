@@ -29,3 +29,6 @@
 
 #### Extracting whole plastomes and coding genes: [05_plastome_n123](https://github.com/Wendellab/CaribbeanAD1/tree/main/05_plastome_n123)
 
+#### Comparing the genetic diversity and population differentiation in Caribbean cotton: [06_Pixy_n121](https://github.com/Wendellab/CaribbeanAD1/tree/main/06_Pixy_n121)
+
+
