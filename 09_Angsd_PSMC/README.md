@@ -22,7 +22,7 @@ thetaStat do_stat $name.thetas.idx -win 50000 -step 10000  -outnames $name.theta
 ```
 
 ### Ne estimation using [PSMC](https://github.com/lh3/psmc)
-### Setup the format from bam to PSMC input format
+#### Setup the format from bam to PSMC input format
 ```
 ref=/work/LAS/jfw-lab/weixuan/00_RefTX0294/AD1.TX2094.v2.fa
 thr=30 #NUMBER_THREADS
