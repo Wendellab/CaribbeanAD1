@@ -19,9 +19,9 @@
 #
 #### Rawreads trimming to final VCF construction: (00_BuildingGVCFs)[https://github.com/Wendellab/CaribbeanAD1/tree/main/00_BuildingGVCFs]
 
-#### Identifying the wild Gb samples: (01_OutgroupSelection_n51)[https://github.com/Wendellab/CaribbeanAD1/tree/main/01_OutgroupSelection_n51]
+#### Identifying wild Gb samples: (01_OutgroupSelection_n51)[https://github.com/Wendellab/CaribbeanAD1/tree/main/01_OutgroupSelection_n51]
 
-#### Rawreads trimming to final VCF construction: (00_BuildingGVCFs)[https://github.com/Wendellab/CaribbeanAD1/tree/main/00_BuildingGVCFs]
+#### Identifying feral Gh samples: (02_FeralCottonPR_n145)[https://github.com/Wendellab/CaribbeanAD1/tree/main/02_FeralCottonPR_n145]
 
 #### Rawreads trimming to final VCF construction: (00_BuildingGVCFs)[https://github.com/Wendellab/CaribbeanAD1/tree/main/00_BuildingGVCFs]
 
