@@ -12,7 +12,7 @@
 </p>
 
 Top: Field collections of Puerto Rican cotton.
-Bottom: Field collections of Guadeloupe cotton.
+Bottom: Greenhouse planted Guadeloupe cotton.
 
 #
 ### Abstract 
