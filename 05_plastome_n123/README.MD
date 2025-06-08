@@ -17,6 +17,9 @@ get_organelle_from_reads.py -t $thr -1 $DIR/"${name}".R1.fq.gz -2 $DIR/"${name}"
 
 #### renaming the plastome output file names by adding sample infor
 ```
+shopt -s globstar  ##globstar will let us match files recursively
+files=( */*.fasta )  ##Array containing matched files, mention where to search and what files here
+
 for i in "${files[@]}"; do d="${i%/*}"; d_="${d##*/}";  f="${i##*/}"; \
 cp "$i" /lustre/hdd/LAS/jfw-lab/weixuan/09_getorgenelle/plastome_output_aln"${d_}"_"$f"; done
 ```
