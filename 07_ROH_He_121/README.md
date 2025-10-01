@@ -2,11 +2,13 @@
 
 #### prepare bi-allelic file for ROH caculation 
 ```
+# use the output from Pixy filtered biallelic vcfs from each chromosome
+# /lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/00_VCFsubset/MKGDPRYuan_n121_combined_bi
 module load picard/2.27.4
 output=MKGDPRYuan_n121
 
 picard GatherVcfs \
-$(for vcf in ../*.combined.bi.vcf.gz; do echo -I "$vcf"; done) \
+$(for vcf in /lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/00_VCFsubset/MKGDPRYuan_n121_combined_bi/*.combined.bi.vcf.gz; do echo -I "$vcf"; done) \
 -O $output.AhDh.combined.bi.vcf.gz 
 
 ml vcftools bcftools
