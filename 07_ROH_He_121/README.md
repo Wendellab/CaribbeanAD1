@@ -7,8 +7,10 @@
 module load picard/2.27.4
 output=MKGDPRYuan_n121
 
+cd /lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/00_VCFsubset/MKGDPRYuan_n121_combined_bi/
+
 picard GatherVcfs \
-$(for vcf in /lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/00_VCFsubset/MKGDPRYuan_n121_combined_bi/*.combined.bi.vcf.gz; do echo -I "$vcf"; done) \
+$(for vcf in /lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/00_VCFsubset/*.combined.bi.vcf.gz; do echo -I "$vcf"; done) \
 -O $output.AhDh.combined.bi.vcf.gz 
 
 ml vcftools bcftools
