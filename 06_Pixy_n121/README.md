@@ -1,5 +1,42 @@
 ### Pixy running with downsampling for Caribbean cottons
 
+#### Prepare vcf for pixy input
+```
+seq=$(printf %02d ${SLURM_ARRAY_TASK_ID})
+echo "$seq"
+
+module purge
+
+ml vcftools bcftools
+
+output=AD1_n121
+
+bcftools merge --threads 5 \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/AD1_MK_n25/AD1_MK_n25.Ah_$seq.combined.vcf.gz \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/05_GD_n21/AD1_GD_n21.Ah_$seq.combined.vcf.gz \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/04_PR_noferal/AD1_PR_n35.Ah_$seq.combined.vcf.gz \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/AD1_Yuan_n40/AD1_Yuan_n40.Ah_$seq.combined.vcf.gz \
+-Oz -o $output.Ah_$seq.combined.vcf.gz
+
+bcftools merge --threads 5 \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/AD1_MK_n25/AD1_MK_n25.Dh_$seq.combined.vcf.gz \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/05_GD_n21/AD1_GD_n21.Dh_$seq.combined.vcf.gz \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/04_PR_noferal/AD1_PR_n35.Dh_$seq.combined.vcf.gz \
+/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/00_interval/AD1_Yuan_n40/AD1_Yuan_n40.Dh_$seq.combined.vcf.gz \
+-Oz -o $output.Dh_$seq.combined.vcf.gz
+
+bcftools view $output.Ah_$seq.combined.vcf.gz --threads 5 \
+-m2 -M2 -i 'F_MISSING==0' -q 0.001:minor -Oz -o $output.Ah_$seq.combined.bi.vcf.gz
+
+bcftools view $output.Dh_$seq.combined.vcf.gz --threads 5 \
+-m2 -M2 -i 'F_MISSING==0' -q 0.001:minor -Oz -o $output.Dh_$seq.combined.bi.vcf.gz
+
+module load parallel/20220522-sxcww47
+parallel tabix -f {} ::: $output.*h_$seq.combined.vcf.gz
+parallel tabix -f {} ::: $output.*h_$seq.combined.bi.vcf.gz
+```
+
+
 #### Generate 20 lists with each population downsample for 5 individuals 
 ```
 # extract the first two parts of strings before second underscore as population name
