@@ -35,7 +35,20 @@ module load parallel/20220522-sxcww47
 parallel tabix -f {} ::: $output.*h_$seq.combined.vcf.gz
 parallel tabix -f {} ::: $output.*h_$seq.combined.bi.vcf.gz
 ```
+#### Merge chromosome vcfs into one for pixy
+```
+module load picard/2.27.4
+output=MKGDPRYuan_n121
 
+picard GatherVcfs \
+$(for vcf in ../*.combined.vcf.gz; do echo -I "$vcf"; done) \
+-O $output.AhDh.combined.vcf.gz 
+
+ml vcftools bcftools
+
+bcftools reheader -s ../rename.MKGDPRYuan_n121.txt $output.AhDh.combined.vcf.gz -o $output.AhDh.combined.rehead.vcf.gz
+tabix $output.AhDh.combined.rehead.vcf.gz
+```
 
 #### Generate 20 lists with each population downsample for 5 individuals 
 ```
