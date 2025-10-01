@@ -86,10 +86,10 @@ bcftools merge --threads 10 \
 -Oz -o MKAD2AD5AD4_n51.Dh_$seq.combined.vcf.gz
 
 bcftools view MKAD2AD5AD4_n51.Ah_$seq.combined.vcf.gz --threads 10 \
--m2 -M2 -i 'F_MISSING=0' -q 0.001:minor -Oz -o MKAD2AD5AD4_n51.Ah_$seq.combined.bi.vcf.gz
+-m2 -M2 -i 'F_MISSING==0' -q 0.001:minor -Oz -o MKAD2AD5AD4_n51.Ah_$seq.combined.bi.vcf.gz
 
 bcftools view MKAD2AD5AD4_n51.Dh_$seq.combined.vcf.gz --threads 10 \
--m2 -M2 -i 'F_MISSING=0' -q 0.001:minor -Oz -o MKAD2AD5AD4_n51.Dh_$seq.combined.bi.vcf.gz
+-m2 -M2 -i 'F_MISSING==0' -q 0.001:minor -Oz -o MKAD2AD5AD4_n51.Dh_$seq.combined.bi.vcf.gz
 
 module load parallel/20220522-sxcww47
 parallel tabix {} ::: MKAD2AD5AD4_n51.*h_$seq.combined.bi.vcf.gz
