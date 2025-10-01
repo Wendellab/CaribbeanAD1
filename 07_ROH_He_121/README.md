@@ -1,5 +1,24 @@
 ### ROH running 
 
+#### prepare bi-allelic file for ROH caculation 
+```
+module load picard/2.27.4
+output=MKGDPRYuan_n121
+
+picard GatherVcfs \
+$(for vcf in ../*.combined.bi.vcf.gz; do echo -I "$vcf"; done) \
+-O $output.AhDh.combined.bi.vcf.gz 
+
+ml vcftools bcftools
+
+bcftools reheader -s ../rename.MKGDPRYuan_n121.txt $output.AhDh.combined.bi.vcf.gz -o $output.AhDh.combined.bi.rehead.vcf
+bcftools annotate --set-id +"%CHROM:%POS:%REF:%ALT" $output.AhDh.combined.bi.rehead.vcf >  $output.AhDh.combined.bi.rehead.id.vcf
+
+grep -v '#' $output.AhDh.combined.bi.rehead.id.vcf | wc -l
+vcftools --vcf $output.AhDh.combined.bi.rehead.id.vcf --het --out $output.het
+
+```
+
 #### setup vcf format for ROH running
 ```
 Dir=/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/00_VCFsubset/MKGDPRYuan_n121_combined_bi
