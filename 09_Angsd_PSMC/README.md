@@ -84,4 +84,242 @@ psmc -N25 -t15 -r5 -b -p "4+25*2+4+6" split.PR325_15.psmcfa -o $outdir/round${se
 psmc -N25 -t15 -r5 -b -p "4+25*2+4+6" split.YUC-G17A.psmcfa -o $outdir/round${seq}.YUC-G17A.psmc
 ```
 
+### Ne estimation using [SMC++](https://github.com/popgenmethods/smcpp)
+#### Prepar input VCF file for smc++
+```
+ml vcftools bcftools
 
+output=MKGDPR_n81
+
+vcf=/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/00_VCFsubset/MKGDPRYuan_n121_combined_bi/MKGDPRYuan_n121.AhDh.combined.bi.rehead.vcf
+
+bcftools query -l $vcf | grep -E "MK|GD|PR" > subset_n81.txt
+
+bcftools view -S subset_n81.txt $vcf \
+-m2 -M2 -i 'F_MISSING==0' -q 0.001:minor \
+-o $output.AhDh.combined.bi.rehead.vcf
+
+bgzip $output.AhDh.combined.bi.rehead.vcf
+tabix $output.AhDh.combined.bi.rehead.vcf.gz
+
+bgzip AD1.TX2094.v2.masked.bed
+tabix -p bed AD1.TX2094.v2.masked.bed.gz
+```
+
+
+```
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=300G 
+#SBATCH --time=05:30:00
+#SBATCH --mail-user=weixuan@iastate.edu
+#SBATCH --mail-type=ALL
+#SBATCH --open-mode=append
+#SBATCH --output="job.beagle_flare.%J.out"
+#SBATCH --job-name="beagle_flare"
+#SBATCH --array=1-13
+
+ml vcftools bcftools
+
+chr=$(printf %02d ${SLURM_ARRAY_TASK_ID})
+vcf=/lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/06_smcpp/MKGDPR_n81.AhDh.combined.bi.rehead.vcf.gz
+
+echo Ah_$chr
+echo Dh_$chr
+
+module purge
+module load openjdk/21.0.3_9-vngib7s
+
+java -Xmx300g -jar beagle.27Feb25.75f.jar gt=$vcf out=MKGDPR_n81.Ah_$chr.phased chrom=Ah_$chr
+java -Xmx300g -jar beagle.27Feb25.75f.jar gt=$vcf out=MKGDPR_n81.Dh_$chr.phased chrom=Dh_$chr
+
+tabix MKGDPR_n81.Ah_$chr.phased.vcf.gz
+tabix MKGDPR_n81.Dh_$chr.phased.vcf.gz
+
+bcftools concat -Oz -o ../MKGDPR_n81.AhDh.combined.phased.vcf.gz $(for vcf in *phased*.gz; do echo "$vcf"; done)
+
+cd ../
+
+# 1. Extract contig lengths from the reference VCF
+bcftools view -h MKGDPR_n81.AhDh.combined.bi.rehead.vcf.gz | \
+grep '^##contig' | \
+awk -F'[=<,]' '{for(i=1;i<=NF;i++){if($i=="ID"){id=$(i+1)}; if($i=="length"){len=$(i+1)}}; if(id && len){print id "\t" len; id=""; len=""}}' > contig_lengths.txt
+
+# contig_lengths.txt will look like:
+# Ah_01   119153486
+# Ah_02   108577906
+# ...
+
+# 2. Replace contig lines in the target VCF
+while IFS=$'\t' read -r contig length; do
+    sed -i "s/##contig=<ID=$contig[^>]*>/##contig=<ID=$contig,length=$length,assembly=unknown>/" MKGDPR_n81.AhDh.combined.phased.vcf
+done < contig_lengths.txt
+
+bgzip MKGDPR_n81.AhDh.combined.phased.vcf
+tabix -f MKGDPR_n81.AhDh.combined.phased.vcf.gz
+```
+
+```
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=200G 
+#SBATCH --time=3-00:00:00
+#SBATCH --mail-user=weixuan@iastate.edu
+#SBATCH --mail-type=ALL
+#SBATCH --output="job.smcpp.%J.out"
+#SBATCH --job-name="smcpp"
+
+####
+module load bcftools
+vcf=MKGDPR_n81.AhDh.combined.phased.vcf.gz
+
+MKlist=$(bcftools query -l $vcf | grep 'MK' | paste -sd,)
+GDlist=$(bcftools query -l $vcf | grep 'GD' | paste -sd,)
+PR_CRlist=$(bcftools query -l $vcf | grep 'PR_CR' | paste -sd,)
+PR_Phlist=$(bcftools query -l $vcf | grep 'PR_Ph' | paste -sd,)
+PR_PR325list=$(bcftools query -l $vcf | grep 'PR_PR325' | paste -sd,)
+
+echo $MKlist
+echo $GDlist
+echo $PR_CRlist
+echo $PR_PR325list
+echo $PR_Phlist
+module purge
+
+####
+source /lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/06_smcpp/smcpp_env/bin/activate 
+
+module load gsl/2.7.1-uuykddp
+module load mpfr/4.2.0-av6zkh3
+module load gmp/6.2.1-dh2y7b4
+module load gcc/12.2.0-khmr45w
+module load python/3.10.10-zwlkg4l
+module load py-numpy/1.26.3-py310-gntgk2n
+
+####
+mkdir -p 01_output
+
+for i in {01..13}
+do
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MK.Ah_${i}.smc.gz Ah_${i} MK:$MKlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MK.Dh_${i}.smc.gz Dh_${i} MK:$MKlist
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/GD.Ah_${i}.smc.gz Ah_${i} GD:$GDlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/GD.Dh_${i}.smc.gz Dh_${i} GD:$GDlist
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/CR.Ah_${i}.smc.gz Ah_${i} CR:$PR_CRlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/CR.Dh_${i}.smc.gz Dh_${i} CR:$PR_CRlist
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/Ph.Ah_${i}.smc.gz Ah_${i} Ph:$PR_Phlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/Ph.Dh_${i}.smc.gz Dh_${i} Ph:$PR_Phlist
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/PR325.Ah_${i}.smc.gz Ah_${i} PR325:$PR_PR325list
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/PR325.Dh_${i}.smc.gz Dh_${i} PR325:$PR_PR325list
+done
+
+
+# Set mutation rate
+MUT_RATE=4.56e-9
+
+# Create analysis directories
+mkdir -p 02_analysis/MK
+mkdir -p 02_analysis/GD
+mkdir -p 02_analysis/CR
+mkdir -p 02_analysis/Ph
+mkdir -p 02_analysis/PR325
+
+# Run smc++ estimate for each population in parallel
+smc++ estimate --timepoints 10 1000000 --cores 30 -o 02_analysis/MK $MUT_RATE 01_output/MK.*.smc.gz 
+smc++ estimate --timepoints 10 1000000 --cores 30 -o 02_analysis/GD $MUT_RATE 01_output/GD.*.smc.gz 
+smc++ estimate --timepoints 10 1000000 --cores 30 -o 02_analysis/CR $MUT_RATE 01_output/CR.*.smc.gz 
+smc++ estimate --timepoints 10 1000000 --cores 30 -o 02_analysis/Ph $MUT_RATE 01_output/Ph.*.smc.gz 
+smc++ estimate --timepoints 10 1000000 --cores 30 -o 02_analysis/PR325 $MUT_RATE 01_output/PR325.*.smc.gz 
+
+###
+cd 02_analysis/
+smc++ plot plot.pdf -g 1 */*.final.json --ylim 0 1000000 -c
+
+###
+
+```
+
+
+```
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=10
+#SBATCH --mem=200G 
+#SBATCH --time=3-00:00:00
+#SBATCH --mail-user=weixuan@iastate.edu
+#SBATCH --mail-type=ALL
+#SBATCH --output="job.smcpp.%J.out"
+#SBATCH --job-name="smcpp"
+
+####
+module load bcftools
+vcf=MKGDPR_n81.AhDh.combined.phased.vcf.gz
+
+MKlist=$(bcftools query -l $vcf | grep 'MK' | paste -sd,)
+GDlist=$(bcftools query -l $vcf | grep 'GD' | paste -sd,)
+PR_CRlist=$(bcftools query -l $vcf | grep 'PR_CR' | paste -sd,)
+PR_Phlist=$(bcftools query -l $vcf | grep 'PR_Ph' | paste -sd,)
+PR_PR325list=$(bcftools query -l $vcf | grep 'PR_PR325' | paste -sd,)
+
+echo $MKlist
+echo $GDlist
+echo $PR_CRlist
+echo $PR_PR325list
+echo $PR_Phlist
+module purge
+
+####
+source /lustre/hdd/LAS/jfw-lab/weixuan/07_PRGD_popgene/04_MKPRGD/06_smcpp/smcpp_env/bin/activate 
+
+module load gsl/2.7.1-uuykddp
+module load mpfr/4.2.0-av6zkh3
+module load gmp/6.2.1-dh2y7b4
+module load gcc/12.2.0-khmr45w
+module load python/3.10.10-zwlkg4l
+module load py-numpy/1.26.3-py310-gntgk2n
+
+####
+mkdir -p 01_output/MKGD
+mkdir -p 01_output/MKPh
+mkdir -p 01_output/GDPh
+
+for i in {01..13}
+do
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKGD/MK_GD.Ah_${i}.smc.gz Ah_${i} MK:$MKlist GD:$GDlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKGD/MK_GD.Dh_${i}.smc.gz Dh_${i} MK:$MKlist GD:$GDlist
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKGD/GD_MK.Ah_${i}.smc.gz Ah_${i} GD:$GDlist MK:$MKlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKGD/GD_MK.Dh_${i}.smc.gz Dh_${i} GD:$GDlist MK:$MKlist
+
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKPh/Ph_MK.Ah_${i}.smc.gz Ah_${i} Ph:$PR_Phlist MK:$MKlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKPh/Ph_MK.Dh_${i}.smc.gz Dh_${i} Ph:$PR_Phlist MK:$MKlist
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKPh/MK_Ph.Ah_${i}.smc.gz Ah_${i} MK:$MKlist Ph:$PR_Phlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/MKPh/MK_Ph.Dh_${i}.smc.gz Dh_${i} MK:$MKlist Ph:$PR_Phlist
+
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/GDPh/Ph_GD.Ah_${i}.smc.gz Ah_${i} Ph:$PR_Phlist GD:$GDlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/GDPh/Ph_GD.Dh_${i}.smc.gz Dh_${i} Ph:$PR_Phlist GD:$GDlist
+
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/GDPh/GD_Ph.Ah_${i}.smc.gz Ah_${i} GD:$GDlist Ph:$PR_Phlist
+smc++ vcf2smc --mask AD1.TX2094.v2.masked.bed.gz $vcf 01_output/GDPh/GD_Ph.Dh_${i}.smc.gz Dh_${i} GD:$GDlist Ph:$PR_Phlist
+
+done
+
+mkdir -p 02_analysis/MKGD
+mkdir -p 02_analysis/MKPh
+mkdir -p 02_analysis/GDPh
+
+smc++ split --timepoints 10 1000000 --cores 30 -o 02_analysis/MKGD/ 02_analysis/MK/model.final.json 02_analysis/GD/model.final.json 01_output/MKGD/*.smc.gz
+smc++ split --timepoints 10 1000000 --cores 30 -o 02_analysis/MKPh/ 02_analysis/MK/model.final.json 02_analysis/Ph/model.final.json 01_output/MKPh/*.smc.gz
+smc++ split --timepoints 10 1000000 --cores 30 -o 02_analysis/GDPh/ 02_analysis/GD/model.final.json 02_analysis/Ph/model.final.json 01_output/GDPh/*.smc.gz
+
+ 
+```
